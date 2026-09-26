@@ -70,3 +70,15 @@ jobs:
           tool-id: ${{ secrets.SN_ORCHESTRATION_TOOL_ID }}
           context-github: ${{ toJSON(github) }}
           job-name: 'ServiceNow Change Control'
+
+  deploy-prod:
+    name: Deploy PROD
+    needs: change-control
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy application to PROD
+        run: |
+          echo "Deploying Customer Order Portal to PROD..."
+          echo "Version: 1.1.0"
+          echo "Production deployment completed successfully."
