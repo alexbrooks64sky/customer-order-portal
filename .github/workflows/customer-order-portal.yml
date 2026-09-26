@@ -29,6 +29,17 @@ jobs:
       - name: Run automated tests with coverage
         run: npm run test:coverage
 
+      - name: Register test results with ServiceNow
+        uses: ServiceNow/servicenow-devops-test-report@v6.0.0
+        with:
+          devops-integration-token: ${{ secrets.SN_DEVOPS_INTEGRATION_TOKEN }}
+          instance-url: ${{ secrets.SN_INSTANCE_URL }}
+          tool-id: ${{ secrets.SN_ORCHESTRATION_TOOL_ID }}
+          context-github: ${{ toJSON(github) }}
+          job-name: 'Build and Test'
+          xml-report-filename: junit.xml
+          test-summary-name: 'Customer Order Portal Jest Tests'
+      
       - name: Validate application
         run: node src/app.js
   deploy-dev:
