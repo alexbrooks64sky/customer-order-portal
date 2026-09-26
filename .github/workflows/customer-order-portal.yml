@@ -42,6 +42,24 @@ jobs:
       
       - name: Validate application
         run: node src/app.js
+
+        
+      - name: Register artifact with ServiceNow
+        uses: ServiceNow/servicenow-devops-register-artifact@v3.1.0
+        with:
+          devops-integration-token: ${{ secrets.SN_DEVOPS_INTEGRATION_TOKEN }}
+          instance-url: ${{ secrets.SN_INSTANCE_URL }}
+          tool-id: ${{ secrets.SN_ORCHESTRATION_TOOL_ID }}
+          context-github: ${{ toJSON(github) }}
+          job-name: 'Build and Test'
+          artifacts: |
+            [{
+              "name": "customer-order-portal",
+              "version": "1.1.${{ github.run_number }}",
+              "semanticVersion": "1.1.${{ github.run_number }}",
+              "repositoryName": "${{ github.repository }}"
+            }]
+        
   deploy-dev:
     name: Deploy DEV
     needs: build-and-test
