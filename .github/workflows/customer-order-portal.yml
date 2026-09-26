@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - '1-add-shipment-tracking-to-order-details'
+      - '2-add-devops-deployment-pipeline'
   pull_request:
     branches:
       - main
@@ -31,3 +31,42 @@ jobs:
 
       - name: Validate application
         run: node src/app.js
+  deploy-dev:
+    name: Deploy DEV
+    needs: build-and-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy application to DEV
+        run: |
+          echo "Deploying Customer Order Portal to DEV..."
+          echo "Version: 1.1.0"
+          echo "Deployment to DEV completed successfully."
+
+  deploy-test:
+    name: Deploy TEST
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy application to TEST
+        run: |
+          echo "Deploying Customer Order Portal to TEST..."
+          echo "Version: 1.1.0"
+          echo "Deployment to TEST completed successfully."
+
+  change-control:
+    name: ServiceNow Change Control
+    needs: deploy-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ServiceNow DevOps Change
+        uses: ServiceNow/servicenow-devops-change@v6.1.0
+        id: create-change
+        with:
+          devops-integration-token: ${{ secrets.SN_DEVOPS_INTEGRATION_TOKEN }}
+          instance-url: ${{ secrets.SN_INSTANCE_URL }}
+          tool-id: ${{ secrets.SN_ORCHESTRATION_TOOL_ID }}
+          context-github: ${{ toJSON(github) }}
+          job-name: 'ServiceNow Change Control'
