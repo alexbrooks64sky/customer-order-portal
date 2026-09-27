@@ -31,3 +31,5 @@ This repository demonstrates an end-to-end DevOps delivery process using:
 Production deployments are governed through ServiceNow DevOps Change Velocity.
 
 ServiceNow gathers evidence from the development lifecycle and applies change governance before allowing the production deployment to proceed.
+
+Pipeline validation: GitHub test evidence is evaluated by ServiceNow DevOps Change Velocity before production deployment.
