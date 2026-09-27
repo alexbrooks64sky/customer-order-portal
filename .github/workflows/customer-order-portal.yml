@@ -1,6 +1,7 @@
 name: Customer Order Portal CI
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
