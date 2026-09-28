@@ -33,3 +33,5 @@ Production deployments are governed through ServiceNow DevOps Change Velocity.
 ServiceNow gathers evidence from the development lifecycle and applies change governance before allowing the production deployment to proceed.
 
 Pipeline validation: GitHub test evidence is evaluated by ServiceNow DevOps Change Velocity before production deployment.
+
+Policy diagnostic: validating availability of test passing percentage during change policy evaluation
