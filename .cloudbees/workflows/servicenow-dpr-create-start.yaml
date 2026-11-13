@@ -1,0 +1,60 @@
+
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: ServiceNow DPR Create Release POC
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    steps:
+      - name: Create ServiceNow DPR Release
+        uses: docker://curlimages/curl:8.11.1
+        shell: sh
+        env:
+          SERVICENOW_USERNAME: cloudbees.dpr.integration
+          SERVICENOW_PASSWORD: ${{ secrets.SERVICENOW_PASSWORD }}
+        run: |
+          set -eu
+
+          cat > /tmp/dpr-payload.json <<'JSON'
+          {
+            "name": "Customer Order Portal CloudBees POC 1.0",
+            "productId": "55183d47c31b4fd0d926d41d05013123",
+            "autoCreateVersionName": "CB-POC-1.0",
+            "templateId": "241666b2c3670718d926d41d0501313e",
+            "releaseOwner": "6816f79cc0a8016401c5a33be04be441",
+            "isDraftRelease": false,
+            "validatesVersion": true
+          }
+          JSON
+
+          echo "Creating CloudBees DPR POC release..."
+
+          status=$(curl --silent --show-error \
+            --basic \
+            --user "$SERVICENOW_USERNAME:$SERVICENOW_PASSWORD" \
+            --header "Accept: application/json" \
+            --header "Content-Type: application/json" \
+            --request POST \
+            --data-binary @/tmp/dpr-payload.json \
+            --output /tmp/dpr-response.json \
+            --write-out "%{http_code}" \
+            --max-time 60 \
+            "https://dev296876.service-now.com/api/sn_dpr/digital_product_release/release")
+
+          echo "HTTP status: $status"
+
+          if [ "$status" != "201" ]; then
+            echo "DPR Create Release failed."
+            exit 1
+          fi
+
+          if ! grep -q '"releaseId"' /tmp/dpr-response.json; then
+            echo "No releaseId found in API response."
+            exit 1
+          fi
+
+          echo "SUCCESS: DPR release creation returned HTTP 201."
+          echo "Release identifier returned by ServiceNow."
