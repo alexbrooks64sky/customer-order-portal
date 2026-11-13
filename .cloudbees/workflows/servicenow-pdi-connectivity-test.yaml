@@ -1,13 +1,21 @@
+
 apiVersion: automation.cloudbees.io/v1alpha1
 kind: workflow
 name: ServiceNow PDI Connectivity Test
+
 on:
   workflow_dispatch:
+
 jobs:
   build:
     steps:
-      - name: Say hello
-        uses: docker://golang:1.20.3-alpine3.17
+      - name: Test ServiceNow PDI connectivity
+        uses: docker://curlimages/curl:8.11.1
         shell: sh
         run: |
-          echo "hello world"
+          curl --silent --show-error \
+               --output /dev/null \
+               --write-out "HTTP status: %{http_code}\n" \
+               --max-time 20 \
+               "https://dev296876.service-now.com/api/now/table/incident?sysparm_limit=1"
+
