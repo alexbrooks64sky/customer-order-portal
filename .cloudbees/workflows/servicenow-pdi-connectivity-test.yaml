@@ -12,10 +12,16 @@ jobs:
       - name: Test ServiceNow PDI connectivity
         uses: docker://curlimages/curl:8.11.1
         shell: sh
+        env:
+          SERVICENOW_USERNAME: cloudbees.dpr.integration
+          SERVICENOW_PASSWORD: ${{ secrets.SERVICENOW_PASSWORD }}
         run: |
           curl --silent --show-error \
-               --output /dev/null \
-               --write-out "HTTP status: %{http_code}\n" \
-               --max-time 20 \
-               "https://dev296876.service-now.com/api/now/table/incident?sysparm_limit=1"
+            --basic \
+            --user "$SERVICENOW_USERNAME:$SERVICENOW_PASSWORD" \
+            --output /dev/null \
+            --write-out "HTTP status: %{http_code}\n" \
+            --fail-with-body \
+            --max-time 20 \
+            "https://dev296876.service-now.com/api/now/table/incident?sysparm_limit=1"
 
