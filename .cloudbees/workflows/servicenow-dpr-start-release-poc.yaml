@@ -1,0 +1,47 @@
+
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: ServiceNow DPR Start Release POC
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    steps:
+      - name: Start ServiceNow DPR Release
+        uses: docker://curlimages/curl:8.11.1
+        shell: sh
+        env:
+          SERVICENOW_USERNAME: cloudbees.dpr.integration
+          SERVICENOW_PASSWORD: ${{ secrets.SERVICENOW_PASSWORD }}
+        run: |
+          set -eu
+
+          echo "Starting existing ServiceNow DPR Release..."
+
+          status=$(curl --silent --show-error \
+            --basic \
+            --user "$SERVICENOW_USERNAME:$SERVICENOW_PASSWORD" \
+            --header "Accept: application/json" \
+            --header "Content-Type: application/json" \
+            --request PUT \
+            --output /tmp/start-response.json \
+            --write-out "%{http_code}" \
+            --max-time 60 \
+            "https://dev296876.service-now.com/api/1092915/customer_order_portal_dpr/release/bc00019ac3641310d926d41d05013148/start")
+
+          echo "HTTP status: $status"
+          echo "ServiceNow response:"
+          cat /tmp/start-response.json
+          echo
+
+          case "$status" in
+            200|201|202|204)
+              echo "Start Release request accepted."
+              ;;
+            *)
+              echo "Start Release request failed."
+              exit 1
+              ;;
+          esac
