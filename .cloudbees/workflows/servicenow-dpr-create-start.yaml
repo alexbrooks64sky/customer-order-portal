@@ -20,9 +20,9 @@ jobs:
 
           cat > /tmp/dpr-payload.json <<'JSON'
           {
-            "name": "Customer Order Portal CloudBees POC 1.0",
+            "name": "Customer Order Portal CloudBees POC 2.0",
             "productId": "55183d47c31b4fd0d926d41d05013123",
-            "autoCreateVersionName": "CB-POC-1.0",
+            "autoCreateVersionName": "CB-POC-2.0",
             "templateId": "241666b2c3670718d926d41d0501313e",
             "releaseOwner": "6816f79cc0a8016401c5a33be04be441",
             "isDraftRelease": false,
