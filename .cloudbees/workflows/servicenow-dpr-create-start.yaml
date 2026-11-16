@@ -48,6 +48,9 @@ jobs:
 
           if [ "$status" != "201" ]; then
             echo "DPR Create Release failed."
+            echo "ServiceNow error response:"
+            cat /tmp/dpr-response.json
+            echo
             exit 1
           fi
 
