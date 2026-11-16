@@ -57,4 +57,7 @@ jobs:
           fi
 
           echo "SUCCESS: DPR release creation returned HTTP 201."
-          echo "Release identifier returned by ServiceNow."
+          echo "ServiceNow response:"
+          cat /tmp/dpr-response.json
+
+          echo
