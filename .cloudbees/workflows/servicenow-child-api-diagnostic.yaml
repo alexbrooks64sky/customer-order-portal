@@ -1,0 +1,52 @@
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: ServiceNow Child API Diagnostic
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    steps:
+      - name: Create ServiceNow Child Change
+        uses: docker://curlimages/curl:8.11.1
+        shell: sh
+        env:
+          SERVICENOW_USERNAME: cloudbees.dpr.integration
+          SERVICENOW_PASSWORD: ${{ secrets.SERVICENOW_PASSWORD }}
+          PARENT_CHANGE_NUMBER: CHG0030119
+        run: |
+          set -eu
+
+          echo "Creating ServiceNow Child Change..."
+          echo "Parent: $PARENT_CHANGE_NUMBER"
+
+          printf '{}'>/tmp/child-request.json
+            
+
+          status=$(curl --silent --show-error \
+            --basic \
+            --user "$SERVICENOW_USERNAME:$SERVICENOW_PASSWORD" \
+            --header "Accept: application/json" \
+            --header "Content-Type: application/json" \
+            --request POST \
+            --data @/tmp/child-request.json \
+            --output /tmp/child-response.json \
+            --write-out "%{http_code}" \
+            --max-time 30 \
+            "https://dev296876.service-now.com/api/1029215/cloudbees_change_api/child")
+
+          echo "HTTP status: $status"
+          cat /tmp/child-response.json
+          echo
+
+          if [ "$status" = "400" ]; then
+            echo "Diagnostic request returned HTTP 400."
+            echo "Inspect the response body above."
+          elif [ "$status" = "201" ]; then
+            echo "WARNING: Unexpected child change creation!"
+            exit 1
+          else
+            echo "Unexpected HTTP status: $status"
+            exit 1
+          fi
