@@ -1,0 +1,49 @@
+
+apiVersion: automation.cloudbees.io/v1alpha1
+kind: workflow
+name: ServiceNow Create Child Change
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    steps:
+      - name: Create ServiceNow Child Change
+        uses: docker://curlimages/curl:8.11.1
+        shell: sh
+        env:
+          SERVICENOW_USERNAME: cloudbees.dpr.integration
+          SERVICENOW_PASSWORD: ${{ secrets.SERVICENOW_PASSWORD }}
+          PARENT_CHANGE_NUMBER: CHG0030119
+        run: |
+          set -eu
+
+          echo "Creating ServiceNow Child Change..."
+          echo "Parent: $PARENT_CHANGE_NUMBER"
+
+          printf '{"short_description":"Child Change created from CloudBees workflow","parent_change_number":"%s","description":"Created by CloudBees POC workflow"}' \
+            "$PARENT_CHANGE_NUMBER" > /tmp/child-request.json
+
+          status=$(curl --silent --show-error \
+            --basic \
+            --user "$SERVICENOW_USERNAME:$SERVICENOW_PASSWORD" \
+            --header "Accept: application/json" \
+            --header "Content-Type: application/json" \
+            --request POST \
+            --data @/tmp/child-request.json \
+            --output /tmp/child-response.json \
+            --write-out "%{http_code}" \
+            --max-time 30 \
+            "https://dev296876.service-now.com/api/1029215/cloudbees_change_api/child")
+
+          echo "HTTP status: $status"
+          cat /tmp/child-response.json
+          echo
+
+          if [ "$status" != "201" ]; then
+            echo "Child Change creation failed."
+            exit 1
+          fi
+
+          echo "Child Change created successfully."
