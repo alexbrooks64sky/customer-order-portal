@@ -31,7 +31,7 @@ jobs:
             --header "Content-Type: application/json" \
             --request POST \
             --data @/tmp/child-request.json \
-            --dump-header/tmp/child-headers.txt \
+            --dump-header /tmp/child-headers.txt \
             --output /tmp/child-response.json \
             --write-out "%{http_code}" \
             --max-time 30 \
