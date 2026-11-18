@@ -39,7 +39,7 @@ jobs:
 
           echo "HTTP status: $status"
           echo "===HTTP RESPONSE HEADERS==="
-          cat/tmp/child-headers.txt
+          cat /tmp/child-headers.txt
           cat /tmp/child-response.json
           echo
 
