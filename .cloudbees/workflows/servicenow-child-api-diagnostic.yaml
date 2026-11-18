@@ -35,7 +35,7 @@ jobs:
             --output /tmp/child-response.json \
             --write-out "%{http_code}" \
             --max-time 30 \
-            "https://dev296876.service-now.com/api/1092915/cloudbees_change_api/change")
+            "https://dev296876.service-now.com/api/1092915/cloudbees_change_api/child")
 
           echo "HTTP status: $status"
           echo "===HTTP RESPONSE HEADERS==="
