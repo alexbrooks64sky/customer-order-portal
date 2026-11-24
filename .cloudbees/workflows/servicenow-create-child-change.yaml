@@ -15,15 +15,18 @@ jobs:
         env:
           SERVICENOW_USERNAME: cloudbees.dpr.integration
           SERVICENOW_PASSWORD: ${{ secrets.SERVICENOW_PASSWORD }}
-          PARENT_CHANGE_NUMBER: CHG0030119
+          PARENT_CHANGE_NUMBER: CHG0030123
         run: |
           set -eu
 
           echo "Creating ServiceNow Child Change..."
           echo "Parent: $PARENT_CHANGE_NUMBER"
 
-          printf '{"short_description":"Child Change created from CloudBees workflow","parent_change_number":"%s","description":"Created by CloudBees POC workflow"}' \
-            "$PARENT_CHANGE_NUMBER" > /tmp/child-request.json
+          
+          printf '{"parent_change_number":"%s","short_description":"CloudBees Change Update API POC - Child","description":"Created by CloudBees POC workflow"}' \
+           "$PARENT_CHANGE_NUMBER" > /tmp/child-request.json
+
+          
 
           status=$(curl --silent --show-error \
             --basic \
